@@ -158,17 +158,13 @@
                 <div class="version-select-group">
                     <label for="version1">Previous Version</label>
                     <select id="version1">
-                        <option>v1.0 - 2024-11-10 (Raw)</option>
-                        <option>v1.1 - 2024-11-11 (Cleaned)</option>
-                        <option selected>v1.2 - 2024-11-11 (Cleaned)</option>
+                        <option value="">Select Version</option>
                     </select>
                 </div>
                 <div class="version-select-group">
                     <label for="version2">Current Version</label>
                     <select id="version2">
-                        <option>v1.1 - 2024-11-11 (Cleaned)</option>
-                        <option>v1.2 - 2024-11-11 (Cleaned)</option>
-                        <option selected>v1.3 - 2024-11-12 (Cleaned)</option>
+                        <option value="">Select Version</option>
                     </select>
                 </div>
             </div>
@@ -176,67 +172,63 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <h4>Rows Added</h4>
-                    <div class="stat-value positive">+127</div>
-                    <div class="stat-change">4.6% increase</div>
+                    <div class="stat-value positive">-</div>
+                    <div class="stat-change">No data</div>
                 </div>
                 <div class="stat-card">
                     <h4>Rows Removed</h4>
-                    <div class="stat-value negative">-342</div>
-                    <div class="stat-change">12.4% decrease</div>
+                    <div class="stat-value negative">-</div>
+                    <div class="stat-change">No data</div>
                 </div>
                 <div class="stat-card">
                     <h4>Values Modified</h4>
-                    <div class="stat-value neutral">1,847</div>
-                    <div class="stat-change">67.2% of data</div>
+                    <div class="stat-value neutral">-</div>
+                    <div class="stat-change">No data</div>
                 </div>
                 <div class="stat-card">
                     <h4>Structural Changes</h4>
-                    <div class="stat-value normal">3</div>
-                    <div class="stat-change">Columns modified</div>
+                    <div class="stat-value normal">-</div>
+                    <div class="stat-change">No data</div>
                 </div>
             </div>
 
             <div class="comparison-section">
                 <h4>
                     <span class="change-badge added">Added Rows</span>
-                    127 new records
+                    <span id="added-rows-count">-</span>
                 </h4>
-                <ul class="change-list">
-                    <li><strong>Row 2749-2875:</strong> New customer records from batch upload on 2024-11-12. Contains data for Q4 2024 new customer acquisitions.</li>
+                <ul class="change-list" id="added-rows-list">
+                    <li class="empty-state">No added rows to display</li>
                 </ul>
             </div>
 
             <div class="comparison-section">
                 <h4>
                     <span class="change-badge removed">Removed Rows</span>
-                    342 duplicate records
+                    <span id="removed-rows-count">-</span>
                 </h4>
-                <ul class="change-list">
-                    <li><strong>Rule R001 applied:</strong> Removed 342 duplicate entries based on ID column. Duplicates identified by matching CustomerID field, kept earliest occurrence based on timestamp.</li>
+                <ul class="change-list" id="removed-rows-list">
+                    <li class="empty-state">No removed rows to display</li>
                 </ul>
             </div>
 
             <div class="comparison-section">
                 <h4>
                     <span class="change-badge modified">Modified Values</span>
-                    1,847 transformations
+                    <span id="modified-values-count">-</span>
                 </h4>
-                <ul class="change-list">
-                    <li><strong>Date column:</strong> All 2,748 dates standardized to YYYY-MM-DD format. Converted from various formats including MM/DD/YYYY, DD-MM-YYYY, and DD/MM/YY.</li>
-                    <li><strong>Amount column:</strong> 156 missing values filled using median imputation ($2,450.00). Data type converted from string to numeric.</li>
-                    <li><strong>Name column:</strong> 243 entries capitalized and trimmed. Removed leading/trailing whitespace and standardized capitalization.</li>
-                    <li><strong>Status column:</strong> 700 values normalized to standard format (e.g., "active", "ACTIVE", "Active" → "Active").</li>
+                <ul class="change-list" id="modified-values-list">
+                    <li class="empty-state">No modified values to display</li>
                 </ul>
             </div>
 
             <div class="comparison-section">
                 <h4>
                     <span class="change-badge modified">Structural Changes</span>
+                    <span id="structural-changes-count">-</span>
                 </h4>
-                <ul class="change-list">
-                    <li><strong>Column renamed:</strong> "Customer_ID" → "CustomerID" for naming convention consistency across dataset.</li>
-                    <li><strong>Column added:</strong> "ValidationStatus" flag column added to track cross-reference validation results (Valid/Review Required).</li>
-                    <li><strong>Data type changed:</strong> "Amount" column converted from string to numeric (decimal) for proper calculations and sorting.</li>
+                <ul class="change-list" id="structural-changes-list">
+                    <li class="empty-state">No structural changes to display</li>
                 </ul>
             </div>
         </div>
@@ -254,7 +246,7 @@
         
         function exportComparison() {
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const content = 'Version Comparison Report\nGenerated: ' + new Date().toLocaleString() + '\n\nRows Added: +127\nRows Removed: -342\nValues Modified: 1,847\nStructural Changes: 3';
+            const content = 'Version Comparison Report\nGenerated: ' + new Date().toLocaleString() + '\n\nRows Added: -\nRows Removed: -\nValues Modified: -\nStructural Changes: -';
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
