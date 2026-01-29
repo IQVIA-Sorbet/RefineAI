@@ -1,0 +1,196 @@
+File_Name: raw_orders_sample.csv
+Total_Rows: 16
+Total_Columns: 16
+Sample_Rows_Head_3[3]{OrderID,CustomerName,Email,Phone,Country,State,City,ProductCode,ProductName,Qty,Unit Price,OrderDate,ShipDate,Status,DiscountCode,Notes}:
+  1001,  alice johnson  ,Alice.Johnson@Example.com ,(555) 012-3456,usa,ca ,San Francisco,P-100,UltraWidget,2,19.99,05-01-2025,06-01-2025,Completed,NEW10,"  NPS:9  "
+  1002,Bob Smith,bob.smith@example.com,+1 555 222 3333,United States,NY,New York,P-200,MegaGadget,1,149.5,05-01-2025,07-01-2025,Shipped,null,first-time buyer
+  1003,carol  O'CONNOR,carol.o@example.com,555.999.8888,USA,TX,Austin,P-300,NanoThing,5,9.5,"Jan 5, 2025","Jan 6, 2025",Pending,VIP20,gift wrap
+Column_Details:
+  OrderID:
+    Data_Type: int64
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 15
+    Descriptive_Stats:
+      count: 16.0
+      mean: 1007.6875
+      std: 4.497684589504545
+      min: 1001.0
+      25%: 1003.75
+      50%: 1007.5
+      75%: 1011.25
+      max: 1015.0
+  CustomerName:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 16
+    Descriptive_Stats:
+      count: 16.0
+      unique: 16.0
+      top:   alice johnson  
+      freq: 1.0
+  Email:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 15
+    Descriptive_Stats:
+      count: 16.0
+      unique: 15.0
+      top: carol.o@example.com
+      freq: 2.0
+  Phone:
+    Data_Type: object
+    Non_Null_Count: 14
+    Null_Count: 2
+    Null_Percentage: 12.5
+    Unique_Values_Count: 14
+    Descriptive_Stats:
+      count: 14.0
+      unique: 14.0
+      top: (555) 012-3456
+      freq: 1.0
+  Country:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 11
+    Descriptive_Stats:
+      count: 16.0
+      unique: 11.0
+      top: USA
+      freq: 3.0
+  State:
+    Data_Type: object
+    Non_Null_Count: 13
+    Null_Count: 3
+    Null_Percentage: 18.75
+    Unique_Values_Count: 10
+    Descriptive_Stats:
+      count: 13.0
+      unique: 10.0
+      top: KL
+      freq: 2.0
+  City:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 11
+    Descriptive_Stats:
+      count: 16.0
+      unique: 11.0
+      top: Kochi
+      freq: 3.0
+  ProductCode:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 8
+    Descriptive_Stats:
+      count: 16.0
+      unique: 8.0
+      top: P-100
+      freq: 4.0
+  ProductName:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 7
+    Descriptive_Stats:
+      count: 16.0
+      unique: 7.0
+      top: UltraWidget
+      freq: 4.0
+  Qty:
+    Data_Type: int64
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 8
+    Descriptive_Stats:
+      count: 16.0
+      mean: 8.875
+      std: 24.41823089414956
+      min: 0.0
+      25%: 1.0
+      50%: 2.0
+      75%: 4.25
+      max: 100.0
+  Unit Price:
+    Data_Type: float64
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 8
+    Descriptive_Stats:
+      count: 16.0
+      mean: 28.77875625
+      std: 47.529945239648214
+      min: 2.25
+      25%: 8.3125
+      50%: 12.0
+      75%: 19.99
+      max: 149.5
+  OrderDate:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 11
+    Descriptive_Stats:
+      count: 16.0
+      unique: 11.0
+      top: 05-01-2025
+      freq: 2.0
+  ShipDate:
+    Data_Type: object
+    Non_Null_Count: 15
+    Null_Count: 1
+    Null_Percentage: 6.25
+    Unique_Values_Count: 11
+    Descriptive_Stats:
+      count: 15.0
+      unique: 11.0
+      top: 10-01-2025
+      freq: 3.0
+  Status:
+    Data_Type: object
+    Non_Null_Count: 16
+    Null_Count: 0
+    Null_Percentage: 0.0
+    Unique_Values_Count: 5
+    Descriptive_Stats:
+      count: 16.0
+      unique: 5.0
+      top: Completed
+      freq: 10.0
+  DiscountCode:
+    Data_Type: object
+    Non_Null_Count: 11
+    Null_Count: 5
+    Null_Percentage: 31.25
+    Unique_Values_Count: 3
+    Descriptive_Stats:
+      count: 11.0
+      unique: 3.0
+      top: NEW10
+      freq: 5.0
+  Notes:
+    Data_Type: object
+    Non_Null_Count: 11
+    Null_Count: 5
+    Null_Percentage: 31.25
+    Unique_Values_Count: 11
+    Descriptive_Stats:
+      count: 11.0
+      unique: 11.0
+      top: "  NPS:9  "
+      freq: 1.0

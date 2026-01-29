@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Execution - RefineAI</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>Rule Execution</h1>
+    </header>
+
+    <div class="container">
+        <h2>Rule Execution Summary</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Rules Applied</h4>
+                <div class="stat-value" id="totalRules">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Success Rate</h4>
+                <div class="stat-value" id="successRate">0%</div>
+                <div id="successInfo"></div>
+            </div>
+            <div class="stat-card">
+                <h4>Rows Affected</h4>
+                <div class="stat-value" id="rowsAffected">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Processing Time</h4>
+                <div class="stat-value" id="processingTime">0s</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rule ID</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Rows Affected</th>
+                        <th>Impact %</th>
+                    </tr>
+                </thead>
+                <tbody id="rulesBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            fetch('/api/results')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("No results found or pipeline failed.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tbody = document.getElementById("rulesBody");
+                    tbody.innerHTML = "";
+
+                    const rules = data.rules;
+                    const history = data.history.filter(h => h.rule_index !== undefined);
+
+                    // Map history to rules. 
+                    // Note: History might contain multiple entries per rule if retries happened, 
+                    // but usually it's one final entry per rule in the history list for the summary.
+                    // We'll iterate through history to build the table.
+
+                    history.forEach(h => {
+                        const ruleId = h.rule_index + 1;
+                        const description = rules[h.rule_index] || "Unknown Rule";
+
+                        let status = "Pending";
+                        let statusClass = "warning"; // Default
+
+                        if (h.audit) {
+                            const approved = h.audit.approve;
+                            status = approved ? "Success" : "Failed";
+                            statusClass = approved ? "success" : "failed";
+                        } else if (h.note && h.note.includes("skipped")) {
+                            status = "Skipped";
+                            statusClass = "warning";
+                        }
+
+                        const rowsAffected = h.diff ? h.diff.row_delta : 0;
+                        const changedCells = h.diff ? h.diff.changed_cells : 0;
+
+                        // Construct row
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                        <td><strong>${ruleId}</strong></td>
+                        <td>${description}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                ${status}
+                            </span>
+                        </td>
+                        <td>${rowsAffected} (Rows), ${changedCells} (Cells)</td>
+                        <td>-</td> 
+                    `;
+                        tbody.appendChild(tr);
+                    });
+
+                    calculateStats();
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.querySelector(".table-container").innerHTML =
+                        `<div style="padding: 20px; text-align: center; color: red;">Error loading results: ${err.message}. <br> Please run the pipeline first from the Upload page.</div>`;
+                });
+        };
+
+        function calculateStats() {
+            const rows = document.querySelectorAll("#rulesBody tr");
+
+            let total = rows.length;
+            let success = 0, failed = 0, affected = 0;
+
+            rows.forEach(row => {
+                const status = row.querySelector(".status-badge").innerText.trim();
+                // Parse "X (Rows)" to get integer
+                const text = row.children[3].innerText;
+                const match = text.match(/(-?\d+)\s*\(Rows\)/);
+                const val = match ? parseInt(match[1]) : 0;
+
+                if (status === "Success") success++;
+                if (status === "Failed") failed++;
+                affected += Math.abs(val); // Track absolute changes probably ? Or net.Let's do absolute for magnitude.
+            });
+
+            const rate = total ? ((success / total) * 100).toFixed(1) : 0;
+
+            document.getElementById("totalRules").innerText = total;
+            document.getElementById("successRate").innerText = rate + "%";
+            document.getElementById("successInfo").innerText =
+                `${success} successful, ${failed} failed`;
+            document.getElementById("rowsAffected").innerText = affected;
+
+            // We don't have exact processing time from backend yet, so we can leave it or remove it.
+            // Or use the one from session storage if available.
+            document.getElementById("processingTime").innerText = "Done";
+        }
+    </script>
+
+</body>
+
+</html>

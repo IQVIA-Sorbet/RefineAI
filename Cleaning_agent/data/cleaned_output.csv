@@ -1,0 +1,13 @@
+order_id,customer_name,Country,State,City,ProductCode,ProductName,Qty,unit_price,order_date,ship_date,Status,ProductCategory,discount_percent,line_total_before_discount,net_total_after_discount
+1001,Alice Johnson,United States,CA,San Francisco,P-100,UltraWidget,2,19.99,2025-05-01,2025-06-01,Completed,Electronics,10.0,39.98,35.98
+1002,Bob Smith,United States,NY,New York,P-200,MegaGadget,1,149.5,2025-05-01,2025-07-01,Shipped,Electronics,,149.5,
+1003,Carol O'Connor,United States,TX,Austin,P-300,NanoThing,5,9.5,2025-09-01,2025-10-01,Completed,Accessories,20.0,47.5,38.0
+1006,Frank   Wu,,KA,Bengaluru,P-200,MegaGadget,2,149.5,2025-07-01,2025-08-01,Completed,Electronics,10.0,299.0,269.1
+1007,George K.,,KL,Kochi,P-500,DataCable,4,2.25,2025-08-01,2025-09-01,Completed,Power,,9.0,
+1008,Hannah   Gomez,United States,WA,Seattle,P-600,ScreenGuard,1,12.0,2025-01-08,2025-01-10,Pending,Storage,10.0,12.0,10.8
+1009,Ivan  Petrov,United States,IL,Chicago,P-300,NanoThing,2,9.5,2025-08-01,2025-10-01,Completed,Accessories,15.0,19.0,16.15
+1011,Mary-Ann   O'Brien,India,MH,Mumbai,P-700,PowerUnit,0,4.75,2025-09-01,2025-10-01,Completed,Optics,,0.0,
+1012,Nora   Chen,,NAN,Kochi,P-500,DataCable,2,2.25,2025-10-01,,Pending,Power,10.0,4.5,4.05
+1013,Oscar   Diaz,,NAN,Manchester,P-600,ScreenGuard,3,12.0,2025-10-01,2025-11-01,Completed,Storage,15.0,36.0,30.6
+1014,Priya  Nair,,KL,Kochi,P-800,Charger,1,15.0,2025-11-01,2025-12-01,Completed,Components,,15.0,
+1015,Quincy   Brown,United States,WA,Seattle,P-100,UltraWidget,100,19.9901,2025-01-11,2025-01-13,Completed,Electronics,20.0,1999.01,1599.21

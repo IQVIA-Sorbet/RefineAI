@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - RefineAI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left h1 { font-size: 24px; color: #333; margin-bottom: 5px; }
+        .header-left p { color: #666; font-size: 14px; }
+        .btn-logout {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-logout:hover { background: #c82333; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .welcome-section h2 { font-size: 28px; margin-bottom: 8px; }
+        .welcome-section p { font-size: 16px; opacity: 0.9; }
+        .btn-create {
+            padding: 14px 28px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-create:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .search-section {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-icon { color: #888; font-size: 18px; }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: #667eea; }
+        .search-results-count { color: #666; font-size: 14px; white-space: nowrap; }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .project-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        .project-card-content { cursor: pointer; }
+        .project-card h3 { font-size: 18px; color: #333; margin-bottom: 8px; }
+        .project-id { font-size: 12px; color: #667eea; font-family: monospace; background: #f0f2ff; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
+        .project-meta { font-size: 13px; color: #666; }
+        .project-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+        .btn-open {
+            flex: 1;
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-open:hover { background: #5a6fd6; }
+        .btn-edit {
+            padding: 10px 16px;
+            background: #fff;
+            color: #28a745;
+            border: 1px solid #28a745;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-edit:hover { background: #28a745; color: white; }
+        .btn-delete {
+            padding: 10px 16px;
+            background: #fff;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: #dc3545; color: white; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            grid-column: 1 / -1;
+        }
+        .empty-state h3 { color: #333; margin-bottom: 12px; }
+        .empty-state p { color: #666; margin-bottom: 24px; }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .modal h3 { font-size: 22px; color: #333; margin-bottom: 24px; }
+        .modal.delete-modal h3 { color: #dc3545; }
+        .modal p { color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .modal .project-name-highlight { font-weight: 600; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:disabled { background: #f8f9fa; color: #666; }
+        .form-group small { display: block; margin-top: 6px; color: #888; font-size: 12px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-secondary, .btn-primary, .btn-danger {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>RefineAI</h1>
+            <p>Welcome back, <span id="currentUser">User</span></p>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+    </header>
+
+    <div class="container">
+        <div class="welcome-section">
+            <div>
+                <h2>Your Projects</h2>
+                <p>Manage and organize your data processing workflows</p>
+            </div>
+            <button class="btn-create" onclick="openCreateModal()">+ Create New Project</button>
+        </div>
+        
+        <div class="search-section">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search projects by name..." oninput="handleSearch()">
+            <span class="search-results-count" id="resultsCount"></span>
+        </div>
+        
+        <div id="projectsContainer" class="projects-grid"></div>
+    </div>
+
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <h3>Create New Project</h3>
+            <div class="form-group">
+                <label for="projectId">Project ID</label>
+                <input type="text" id="projectId" disabled>
+                <small>Auto-generated unique identifier</small>
+            </div>
+            <div class="form-group">
+                <label for="projectName">Project Name</label>
+                <input type="text" id="projectName" placeholder="Enter project name" maxlength="50">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn-primary" onclick="createProject()">Create Project</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal delete-modal">
+            <h3>⚠️ Delete Project</h3>
+            <p>Are you sure you want to delete <span class="project-name-highlight" id="deleteProjectName"></span>? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-danger" onclick="confirmDelete()">Delete Project</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="renameModal">
+        <div class="modal">
+            <h3>✏️ Rename Project</h3>
+            <div class="form-group">
+                <label for="newProjectName">New Project Name</label>
+                <input type="text" id="newProjectName" placeholder="Enter new project name" maxlength="50">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeRenameModal()">Cancel</button>
+                <button class="btn-primary" onclick="confirmRename()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let projectToDelete = null;
+        let projectToRename = null;
+
+        const currentUser = sessionStorage.getItem('currentUser') || 'Demo User';
+        document.getElementById('currentUser').textContent = currentUser;
+
+        function handleLogout() {
+            sessionStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentProject');
+            window.location.href = 'login.html';
+        }
+
+        function generateProjectId() {
+            const timestamp = Date.now().toString(36).toUpperCase();
+            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `PRJ-${timestamp}-${random}`;
+        }
+
+        function getProjects() {
+            return JSON.parse(sessionStorage.getItem('projects') || '[]');
+        }
+
+        function saveProjects(projects) {
+            sessionStorage.setItem('projects', JSON.stringify(projects));
+        }
+
+        function handleSearch() {
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projectsContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            let projects = getProjects();
+            
+            const filteredProjects = searchTerm 
+                ? projects.filter(p => p.name.toLowerCase().includes(searchTerm))
+                : projects;
+
+            const countEl = document.getElementById('resultsCount');
+            if (searchTerm) {
+                countEl.textContent = `${filteredProjects.length} of ${projects.length} projects`;
+            } else {
+                countEl.textContent = projects.length > 0 ? `${projects.length} project${projects.length !== 1 ? 's' : ''}` : '';
+            }
+
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Projects Yet</h3>
+                        <p>Create your first project to get started</p>
+                        <button class="btn-primary" onclick="openCreateModal()" style="width:auto;padding:12px 24px;">
+                            Create Your First Project
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (filteredProjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Matching Projects</h3>
+                        <p>No projects found matching "${searchTerm}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredProjects.map(project => `
+                <div class="project-card">
+                    <div class="project-card-content" onclick="openProject('${project.id}')">
+                        <h3>${project.name}</h3>
+                        <div class="project-id">${project.id}</div>
+                        <div class="project-meta">Created: ${new Date(project.created).toLocaleDateString()}</div>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn-open" onclick="openProject('${project.id}')">Open Project</button>
+                        <button class="btn-edit" onclick="openRenameModal('${project.id}', '${project.name.replace(/'/g, "\\'")}')">Rename</button>
+                        <button class="btn-delete" onclick="openDeleteModal('${project.id}', '${project.name.replace(/'/g, "\\'")}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openCreateModal() {
+            document.getElementById('projectId').value = generateProjectId();
+            document.getElementById('projectName').value = '';
+            document.getElementById('createModal').classList.add('active');
+            document.getElementById('projectName').focus();
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        function openDeleteModal(projectId, projectName) {
+            projectToDelete = projectId;
+            document.getElementById('deleteProjectName').textContent = projectName;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            projectToDelete = null;
+        }
+
+        function openRenameModal(projectId, projectName) {
+            projectToRename = projectId;
+            document.getElementById('newProjectName').value = projectName;
+            document.getElementById('renameModal').classList.add('active');
+            document.getElementById('newProjectName').focus();
+            document.getElementById('newProjectName').select();
+        }
+
+        function closeRenameModal() {
+            document.getElementById('renameModal').classList.remove('active');
+            projectToRename = null;
+        }
+
+        function confirmRename() {
+            if (!projectToRename) return;
+            
+            const newName = document.getElementById('newProjectName').value.trim();
+            if (!newName) { alert('Please enter a project name'); return; }
+            
+            let projects = getProjects();
+            const projectIndex = projects.findIndex(p => p.id === projectToRename);
+            if (projectIndex !== -1) {
+                projects[projectIndex].name = newName;
+                saveProjects(projects);
+            }
+            closeRenameModal();
+            renderProjects();
+        }
+
+        function confirmDelete() {
+            if (!projectToDelete) return;
+            
+            let projects = getProjects();
+            projects = projects.filter(p => p.id !== projectToDelete);
+            saveProjects(projects);
+            closeDeleteModal();
+            renderProjects();
+        }
+
+        function createProject() {
+            const projectId = document.getElementById('projectId').value;
+            const projectName = document.getElementById('projectName').value.trim();
+            if (!projectName) { alert('Please enter a project name'); return; }
+
+            const projects = getProjects();
+            projects.unshift({ id: projectId, name: projectName, created: new Date().toISOString(), owner: currentUser });
+            saveProjects(projects);
+            closeCreateModal();
+            document.getElementById('searchInput').value = '';
+            renderProjects();
+            alert(`Project "${projectName}" created successfully!`);
+        }
+
+        // Updated function to navigate to dashboard
+        function openProject(projectId) {
+            sessionStorage.setItem('currentProject', projectId);
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('createModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCreateModal();
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        document.getElementById('renameModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRenameModal();
+        });
+
+        document.getElementById('projectName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') createProject();
+        });
+
+        document.getElementById('newProjectName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') confirmRename();
+        });
+
+        renderProjects();
+    </script>
+</body>
+</html>

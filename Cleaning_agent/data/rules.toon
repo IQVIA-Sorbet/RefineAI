@@ -1,0 +1,28 @@
+cleaning_note_sample.xlsx:
+  Main:
+    Name[14]: R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14
+    description[14]: Trim leading/trailing whitespace from all string columns., Standardize case for the below selected columns list
+(CustomerName:TITLE, Country:UPPER, State:UPPER, Email:LOWER, Status:TITLE), Rename incoming columns using the mapping in rename_map., Parse dates from multiple formats into ISO yyyy-mm-dd., Normalize country names and enrich with ISO and phone code.Lookup merge to standardize the Country column and add extra details. It matches Country in your dataset with RawCountry in the country_ref sheet, then appends CountryISO, CountryName, and PhoneCountryCode. This ensures consistent country names and provides ISO codes and phone codes for enrichment., Enrich product with standardized name and category.
+Lookup merge to standardize the ProductCode column and add extra details. It matches ProductCode in your dataset with ProductCode in the product_ref sheet, then appends StdProductName and ProductCategory, Map discount codes to percent value., Compute line total before discount.
+{"expr": "Quantity * UnitPrice", "round": 2}, Compute net total after discount.
+{"expr": "LineTotal * (1 - DiscountPct/100)", "round": 2}, Drop test/cancelled orders and rows with sample notes., Fills null values using defaults and conditions. Sets State to “Unknown” and Phone to “N/A” when blank. Additionally, if CountryISO is “USA” and State is missing, it assigns “Unknown”, Deduplicate by OrderID keeping the latest by OrderDate., Drop low-value or internal-use columns. Use drop_columns reference tab, Validate critical fields in the dataset to ensure data quality. Checks that Quantity is at least 1, UnitPrice is greater than 0, and Email matches a proper format, logging any issues without removing rows.(do not drop)
+  rename_map:
+    from[2]: Qty, Unit Price
+    to[2]: Quantity, UnitPrice
+  drop_columns:
+    column[1]: Notes
+  product_ref:
+    ProductCode[8]: P-100, P-200, P-300, P-400, P-500, P-600, P-700, P-800
+    StdProductName[8]: Ultra Widget, Mega Gadget, Nano Thing, Power Unit, Data Cable, Screen Guard, Power Unit, Charger
+    ProductCategory[8]: Widgets, Gadgets, Accessories, Power, Cables, Accessories, Power, Power
+  discount_ref:
+    DiscountCode[3]: NEW10, VIP20, WINTER15
+    DiscountPct[3]: 10, 20, 15
+  country_ref:
+    RawCountry[10]: usa, USA, United States, United States , UK, gBr, United Kingdom, India, IN, IND
+    CountryISO[10]: USA, USA, USA, USA, GBR, GBR, GBR, IND, IND, IND
+    CountryName[10]: United States, United States, United States, United States, United Kingdom, United Kingdom, United Kingdom, India, India, India
+    PhoneCountryCode[10]: 1, 1, 1, 1, 44, 44, 44, 91, 91, 91
+  status_ref:
+    RawStatus[5]: Completed, Shipped, Pending, Cancelled, Test
+    NormalizedStatus[5]: Completed, Completed, Pending, Cancelled, Test

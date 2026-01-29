@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload - RefineAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-logout {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .upload-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .upload-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-zone p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .file-item span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .file-item small {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .info-text {
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>File Upload</h1>
+            <p>Upload CSV and Rules files</p>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html">← Back to Dashboard</a>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Upload Files for Processing</h2>
+
+        <div class="upload-grid">
+            <div class="upload-card">
+                <h3>📄 Raw CSV File (Input)</h3>
+                <label for="csvUpload">
+                    <div class="upload-zone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload raw CSV file</p>
+                    </div>
+                </label>
+                <input type="file" id="csvUpload" accept=".csv" class="hidden"
+                    onchange="handleFileUpload(event, 'csv')">
+                <div id="csvFileList" class="file-list"></div>
+            </div>
+
+            <div class="upload-card">
+                <h3>📊 Rules File (Excel)</h3>
+                <label for="rulesUpload">
+                    <div class="upload-zone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload Excel rules file</p>
+                    </div>
+                </label>
+                <input type="file" id="rulesUpload" accept=".xlsx,.xls" class="hidden"
+                    onchange="handleFileUpload(event, 'rules')">
+                <div id="rulesFileList" class="file-list"></div>
+            </div>
+
+            <div class="upload-card">
+                <h3>⚙️ Process Files</h3>
+                <div style="padding: 40px 0;">
+                    <button class="btn-primary" id="processBtn" onclick="processFiles()" disabled>
+                        Apply Rules & Process
+                    </button>
+                    <p class="info-text">Upload both files to enable processing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentUser = sessionStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        let uploadedCSV = null;
+        let uploadedRules = null;
+
+        function handleLogout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const listId = type === 'csv' ? 'csvFileList' : 'rulesFileList';
+            const container = document.getElementById(listId);
+
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'file-item';
+            fileDiv.innerHTML = `
+            <div>
+                <span>${file.name}</span><br>
+                <small>${(file.size / 1024).toFixed(2)} KB</small>
+            </div>
+            <small style="color: #28a745;">✓ Uploaded</small>
+        `;
+            container.innerHTML = '';
+            container.appendChild(fileDiv);
+
+            if (type === 'csv') {
+                uploadedCSV = file;
+            } else {
+                uploadedRules = file;
+            }
+
+            if (uploadedCSV && uploadedRules) {
+                document.getElementById('processBtn').disabled = false;
+            }
+        }
+
+        function processFiles() {
+            if (!uploadedCSV || !uploadedRules) {
+                alert('Please upload both CSV and Rules files');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', uploadedCSV);
+            formData.append('rules', uploadedRules);
+
+            const btn = document.getElementById('processBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            fetch('/run', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'completed') {
+                        sessionStorage.setItem('lastProcessedCSV', uploadedCSV.name);
+                        sessionStorage.setItem('lastProcessedRules', uploadedRules.name);
+                        sessionStorage.setItem('processingTime', new Date().toISOString());
+
+                        alert('✓ Processing Complete!\n\nRedirecting to results...');
+                        window.location.href = 'rules.html'; // Or wherever you want to show results
+                    } else {
+                        alert('Processing failed: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during processing.');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                });
+        }
+    </script>
+</body>
+
+</html>

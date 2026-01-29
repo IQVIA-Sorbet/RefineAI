@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File History - Rule Application Engine</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left h1 { font-size: 24px; color: #333; margin-bottom: 5px; }
+        .header-left p { color: #666; font-size: 14px; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px; }
+        .nav-links a:hover { text-decoration: underline; }
+        .btn-logout {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn-logout:hover { background: #c82333; }
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+        h2 { font-size: 28px; color: #333; margin-bottom: 30px; }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8f9fa; }
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        td { padding: 16px; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+        tbody tr:hover { background: #f8f9fa; }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.success { background: #d4edda; color: #155724; }
+        .status-badge.processing { background: #d1ecf1; color: #0c5460; }
+        .status-badge.original { background: #e2e3e5; color: #383d41; }
+        .download-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .download-btn:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .header { padding: 20px; flex-direction: column; gap: 15px; }
+            .table-container { overflow-x: auto; }
+            table { min-width: 1000px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>File History</h1>
+            <p>Complete processing history</p>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html">← Dashboard</a>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>File Processing History</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Upload Date</th>
+                        <th>Type</th>
+                        <th>Rules Applied</th>
+                        <th>Status</th>
+                        <th>Total Rows</th>
+                        <th>File Size</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>v1.3</strong></td>
+                        <td>2024-11-12 14:23:45</td>
+                        <td>Cleaned</td>
+                        <td>24</td>
+                        <td><span class="status-badge success">Completed</span></td>
+                        <td>2,748</td>
+                        <td>384 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('cleaned_v1.3.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v1.3')">Details</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>v1.2</strong></td>
+                        <td>2024-11-11 10:15:30</td>
+                        <td>Cleaned</td>
+                        <td>22</td>
+                        <td><span class="status-badge success">Completed</span></td>
+                        <td>2,963</td>
+                        <td>412 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('cleaned_v1.2.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v1.2')">Details</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>v1.1</strong></td>
+                        <td>2024-11-10 16:42:12</td>
+                        <td>Cleaned</td>
+                        <td>20</td>
+                        <td><span class="status-badge success">Completed</span></td>
+                        <td>2,890</td>
+                        <td>398 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('cleaned_v1.1.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v1.1')">Details</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>v1.0</strong></td>
+                        <td>2024-11-10 14:20:05</td>
+                        <td>Raw</td>
+                        <td>0</td>
+                        <td><span class="status-badge original">Original</span></td>
+                        <td>3,205</td>
+                        <td>445 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('raw_v1.0.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v1.0')">Details</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>v0.9</strong></td>
+                        <td>2024-11-08 09:30:22</td>
+                        <td>Cleaned</td>
+                        <td>18</td>
+                        <td><span class="status-badge success">Completed</span></td>
+                        <td>2,654</td>
+                        <td>371 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('cleaned_v0.9.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v0.9')">Details</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>v0.8</strong></td>
+                        <td>2024-11-07 11:45:10</td>
+                        <td>Cleaned</td>
+                        <td>19</td>
+                        <td><span class="status-badge success">Completed</span></td>
+                        <td>2,501</td>
+                        <td>348 KB</td>
+                        <td>
+                            <button class="download-btn" onclick="downloadFile('cleaned_v0.8.csv')">Download</button>
+                            <button class="download-btn" onclick="viewDetails('v0.8')">Details</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+        
+        function handleLogout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+        
+        function downloadFile(filename) {
+            const content = `Sample CSV content for ${filename}\nColumn1,Column2,Column3\nData1,Data2,Data3\nSample,Values,Here`;
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert(`✓ ${filename} downloaded successfully!`);
+        }
+        
+        function viewDetails(version) {
+            alert(`Version ${version} Details:\n\n• Processing timestamp\n• Rules applied: Complete list\n• Data quality metrics\n• Transformation breakdown\n• Success/failure statistics\n• Performance metrics`);
+        }
+    </script>
+</body>
+</html>

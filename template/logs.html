@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution Logs - RefineAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-logout,
+        .btn-export {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+        }
+
+        .btn-export {
+            background: #667eea;
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .btn-export:hover {
+            background: #5568d3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .log-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            padding: 24px;
+        }
+
+        .log-entry {
+            padding: 16px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .log-entry.success {
+            border-left-color: #28a745;
+        }
+
+        .log-entry.error {
+            border-left-color: #dc3545;
+        }
+
+        .log-entry.warning {
+            border-left-color: #ffc107;
+        }
+
+        .log-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .log-entry-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .log-entry-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .log-entry-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .log-entry-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .log-stat {
+            color: #666;
+        }
+
+        .log-stat strong {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>Execution Logs</h1>
+            <p>Detailed rule execution history</p>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html">← Dashboard</a>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section-header">
+            <h2>Detailed Execution Logs</h2>
+            <button class="btn-export" onclick="exportLogs()">📥 Export Logs</button>
+        </div>
+
+        <div class="log-container" id="logContainer">
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>No execution logs available yet.</p>
+                <p style="margin-top: 10px; font-size: 14px;">Upload and process files to see execution logs here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple auth check
+        if (!sessionStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+
+        // We don't enforce project check for now as backend is single-state
+        // const currentProject = sessionStorage.getItem('currentProject');
+
+        function loadLogs() {
+            const logContainer = document.getElementById('logContainer');
+
+            fetch('/api/results')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("No logs available yet.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const rules = data.rules;
+                    const history = data.history.filter(h => h.rule_index !== undefined);
+                    const processedAt = data.summary ? data.summary.processed_at : new Date().toISOString();
+
+                    if (history.length === 0) {
+                        logContainer.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #666;">
+                                <p>No execution logs available yet.</p>
+                                <p style="margin-top: 10px; font-size: 14px;">Upload and process files to see execution logs here.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    logContainer.innerHTML = history.map((h, i) => {
+                        const ruleDesc = rules[h.rule_index] || "Unknown Rule";
+                        let status = "Pending";
+                        let statusClass = "warning";
+                        let statusIcon = "⚠";
+
+                        if (h.audit) {
+                            if (h.audit.approve) {
+                                status = "Success";
+                                statusClass = "success";
+                                statusIcon = "✓";
+                            } else {
+                                status = "Error"; // Or Rejected
+                                statusClass = "error";
+                                statusIcon = "✗";
+                            }
+                        } else if (h.note && h.note.includes("skipped")) {
+                            status = "Skipped";
+                            statusClass = "warning";
+                            statusIcon = "⚠";
+                        }
+
+                        const rowsAffected = h.diff ? h.diff.row_delta : 0;
+                        const impact = "N/A";
+
+                        return `
+                            <div class="log-entry ${statusClass}">
+                                <div class="log-entry-header">
+                                    <span class="log-entry-title">${statusIcon} Rule #${h.rule_index + 1}: ${ruleDesc}</span>
+                                    <span class="log-entry-time">${new Date(processedAt).toLocaleString()}</span>
+                                </div>
+                                <div class="log-entry-details">
+                                    <strong>Details:</strong> ${h.note || 'Executed'}<br>
+                                    ${h.audit && h.audit.reason ? `<strong>Auditor Reason:</strong> ${h.audit.reason}` : ''}
+                                </div>
+                                <div class="log-entry-stats">
+                                    <span class="log-stat"><strong>Rows affected:</strong> ${rowsAffected}</span>
+                                    <span class="log-stat"><strong>Status:</strong> ${status}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                })
+                .catch(err => {
+                    logContainer.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <p>${err.message}</p>
+                            <p style="margin-top: 10px; font-size: 14px;">Upload and process files to see execution logs here.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentProject');
+            window.location.href = 'login.html';
+        }
+
+        function exportLogs() {
+            fetch('/api/results')
+                .then(res => res.json())
+                .then(data => {
+                    const history = data.history || [];
+                    const content = JSON.stringify(history, null, 2);
+                    const blob = new Blob([content], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'execution_logs.json';
+                    a.click();
+                })
+                .catch(e => alert("Failed to export logs: " + e.message));
+        }
+
+        // Load logs on page load
+        loadLogs();
+    </script>
+</body>
+
+</html>
